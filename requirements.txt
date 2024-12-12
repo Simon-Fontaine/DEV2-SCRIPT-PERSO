@@ -1,2 +1,5 @@
 pandas
 rich
+pytest
+pytest-cov
+coverage
