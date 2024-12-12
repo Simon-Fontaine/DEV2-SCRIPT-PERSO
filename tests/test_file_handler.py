@@ -3,7 +3,7 @@ import pandas as pd
 import tempfile
 import os
 from pathlib import Path
-from src.inventory_manager.utils.file_handler import FileHandler
+from inventory_manager.utils.file_handler import FileHandler
 
 
 class TestFileHandler(unittest.TestCase):

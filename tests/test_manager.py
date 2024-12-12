@@ -3,7 +3,7 @@ import pandas as pd
 import tempfile
 import os
 from pathlib import Path
-from src.inventory_manager.core.manager import InventoryManager
+from inventory_manager.core.manager import InventoryManager
 
 
 class TestInventoryManager(unittest.TestCase):

@@ -1,5 +1,18 @@
 Métrique,Valeur
-Nombre total de produits,12.0
-Nombre de catégories,2.0
-Valeur totale du stock,42453.020000000004
-Prix moyen,357.9066666666666
+Nombre total de produits,18.0
+Nombre de catégories,3.0
+Valeur totale du stock,64852.409999999996
+Prix moyen,388.6011111111111
+Produits en stock faible (<10),6.0
+Books - Nombre de produits,6.0
+Books - Valeur totale,5253.7
+Books - Prix moyen,44.156666666666666
+Books - Stock total,130.0
+Electronics - Nombre de produits,6.0
+Electronics - Valeur totale,37199.32
+Electronics - Prix moyen,671.6566666666666
+Electronics - Stock total,68.0
+Furniture - Nombre de produits,6.0
+Furniture - Valeur totale,22399.390000000003
+Furniture - Prix moyen,449.98999999999995
+Furniture - Stock total,61.0

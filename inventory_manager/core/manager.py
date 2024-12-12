@@ -73,7 +73,7 @@ class InventoryManager:
 
     def generate_report(self, output_file: str) -> None:
         """
-        Génère un rapport récapitulatif.
+        Génère un rapport récapitulatif détaillé.
 
         Args:
             output_file (str): Chemin du fichier de sortie
@@ -81,8 +81,8 @@ class InventoryManager:
         if self.inventory_df is None:
             raise ValueError("Base de données non initialisée")
 
-        # Calcul des statistiques
-        stats_df = pd.DataFrame(
+        # Statistiques globales
+        global_stats = pd.DataFrame(
             [
                 {
                     "Métrique": "Nombre total de produits",
@@ -102,7 +102,43 @@ class InventoryManager:
                     "Métrique": "Prix moyen",
                     "Valeur": self.inventory_df["unit_price"].mean(),
                 },
+                {
+                    "Métrique": "Produits en stock faible (<10)",
+                    "Valeur": len(
+                        self.inventory_df[self.inventory_df["quantity"] < 10]
+                    ),
+                },
             ]
+        )
+
+        # Statistiques par catégorie
+        category_stats = []
+        for category in self.inventory_df["category"].unique():
+            cat_df = self.inventory_df[self.inventory_df["category"] == category]
+            category_stats.extend(
+                [
+                    {
+                        "Métrique": f"{category} - Nombre de produits",
+                        "Valeur": len(cat_df),
+                    },
+                    {
+                        "Métrique": f"{category} - Valeur totale",
+                        "Valeur": (cat_df["quantity"] * cat_df["unit_price"]).sum(),
+                    },
+                    {
+                        "Métrique": f"{category} - Prix moyen",
+                        "Valeur": cat_df["unit_price"].mean(),
+                    },
+                    {
+                        "Métrique": f"{category} - Stock total",
+                        "Valeur": cat_df["quantity"].sum(),
+                    },
+                ]
+            )
+
+        # Combiner les statistiques
+        stats_df = pd.concat(
+            [global_stats, pd.DataFrame(category_stats)], ignore_index=True
         )
 
         # Sauvegarder le rapport

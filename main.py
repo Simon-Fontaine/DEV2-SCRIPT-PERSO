@@ -2,7 +2,8 @@ import argparse
 import sys
 import logging
 from pathlib import Path
-from src.inventory_manager.core.manager import InventoryManager
+import pandas as pd
+from inventory_manager.core.manager import InventoryManager
 from rich.console import Console
 from rich.table import Table
 from rich import print as rprint
@@ -135,12 +136,58 @@ def handle_search_command(manager: InventoryManager, args):
 def handle_report_command(manager: InventoryManager, args):
     """Gère la commande 'report'."""
     try:
+        # Générer le rapport
+        manager.generate_report(args.output)
+
         if args.format == "csv":
-            manager.generate_report(args.output)
             rprint(f"[green]Rapport généré avec succès : {args.output}[/green]")
         else:
-            # TODO: Implémenter l'affichage console du rapport
-            pass
+            # Lire et afficher le rapport
+            report_df = pd.read_csv(args.output)
+
+            # Tableau pour les statistiques globales
+            global_table = Table(show_header=True, header_style="bold magenta")
+            global_table.add_column("Métrique")
+            global_table.add_column("Valeur")
+
+            # Filtrer les statistiques globales (celles qui ne commencent pas par une catégorie)
+            global_stats = report_df[~report_df["Métrique"].str.contains(" - ")]
+            for _, row in global_stats.iterrows():
+                value = (
+                    f"{row['Valeur']:,.2f}"
+                    if isinstance(row["Valeur"], (int, float))
+                    else str(row["Valeur"])
+                )
+                global_table.add_row(row["Métrique"], value)
+
+            rprint("\n[bold blue]Statistiques Globales[/bold blue]")
+            console.print(global_table)
+
+            # Tableaux pour chaque catégorie
+            categories = {
+                s.split(" - ")[0] for s in report_df["Métrique"] if " - " in s
+            }
+
+            for category in categories:
+                cat_table = Table(show_header=True, header_style="bold magenta")
+                cat_table.add_column("Métrique")
+                cat_table.add_column("Valeur")
+
+                cat_stats = report_df[report_df["Métrique"].str.startswith(category)]
+                for _, row in cat_stats.iterrows():
+                    metric = row["Métrique"].split(" - ")[
+                        1
+                    ]  # Retirer le préfixe de la catégorie
+                    value = (
+                        f"{row['Valeur']:,.2f}"
+                        if isinstance(row["Valeur"], (int, float))
+                        else str(row["Valeur"])
+                    )
+                    cat_table.add_row(metric, value)
+
+                rprint(f"\n[bold blue]Statistiques {category}[/bold blue]")
+                console.print(cat_table)
+
     except Exception as e:
         rprint(f"[red]Erreur lors de la génération du rapport : {str(e)}[/red]")
 

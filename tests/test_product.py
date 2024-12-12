@@ -1,6 +1,5 @@
-# tests/test_product.py
 import unittest
-from src.inventory_manager.models.product import Product
+from inventory_manager.models.product import Product
 
 
 class TestProduct(unittest.TestCase):
