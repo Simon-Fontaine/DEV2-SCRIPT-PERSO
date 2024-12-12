@@ -58,20 +58,42 @@ class TestInventoryManager(unittest.TestCase):
 
     def test_stock_alerts(self):
         """Test du système d'alertes de stock."""
+        test_data = pd.DataFrame(
+            {
+                "name": ["Produit1", "Produit2", "Produit3"],
+                "quantity": [
+                    5,
+                    15,
+                    3,
+                ],  # Produits avec différentes quantités pour tester les alertes
+                "unit_price": [100.0, 200.0, 300.0],
+                "category": ["Cat1", "Cat2", "Cat1"],
+            }
+        )
+        test_data.to_csv(Path(self.temp_dir) / "test.csv", index=False)
+
         self.manager.consolidate_files()
 
-        # Test du seuil par défaut
+        # Test du seuil par défaut (10)
         alerts = self.manager.check_stock_alerts()
-        self.assertIsInstance(alerts, list)
+        self.assertEqual(len(alerts), 2)  # Devrait avoir 2 produits sous le seuil
 
         # Test de modification du seuil
-        self.manager.set_stock_threshold(25)
-        self.assertEqual(self.manager.stock_threshold, 25)
+        self.manager.set_stock_threshold(15)
+        alerts = self.manager.check_stock_alerts()
+        self.assertEqual(len(alerts), 3)  # Devrait avoir 3 produits sous le seuil
 
-        # Test avec un nouveau seuil
+        # Test des produits en stock bas
         low_stock = self.manager.get_low_stock_products()
-        self.assertGreater(len(low_stock), 0)
+        self.assertEqual(len(low_stock), 3)
+
+        # Test du contenu des alertes
+        alert = alerts[0]
+        self.assertIn("ALERTE", alert)
+        self.assertIn("unités restantes", alert)
 
         # Test avec un seuil invalide
         with self.assertRaises(ValueError):
             self.manager.set_stock_threshold(-5)
+        with self.assertRaises(ValueError):
+            self.manager.set_stock_threshold("invalid")

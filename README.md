@@ -30,6 +30,12 @@ python main.py search [--name NOM] [--category CAT] [--min-price PRIX] [--max-pr
 python main.py report [--output rapport.csv] [--format csv|console]
 ```
 
+4. **Alertes de stock**
+
+```bash
+python main.py alerts [--threshold SEUIL] [--check]
+```
+
 ## Tests
 
 ```bash

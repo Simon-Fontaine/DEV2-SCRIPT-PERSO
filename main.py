@@ -245,6 +245,8 @@ def main():
         # Exécution de la commande
         if args.command == "list":
             handle_list_command(manager, args)
+        elif args.command == "alerts":
+            handle_alerts_command(manager, args)
         elif args.command == "search":
             handle_search_command(manager, args)
         elif args.command == "report":

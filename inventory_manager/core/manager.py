@@ -43,8 +43,17 @@ class InventoryManager:
 
         Args:
             threshold (int): Nouveau seuil d'alerte
+
+        Raises:
+            ValueError: Si le seuil n'est pas un entier positif
+            TypeError: Si le seuil n'est pas du bon type
         """
-        if not isinstance(threshold, int) or threshold < 0:
+        try:
+            threshold = int(threshold)
+        except (TypeError, ValueError):
+            raise ValueError("Le seuil doit être un nombre entier")
+
+        if threshold < 0:
             raise ValueError("Le seuil doit être un entier positif")
         self.stock_threshold = threshold
 
