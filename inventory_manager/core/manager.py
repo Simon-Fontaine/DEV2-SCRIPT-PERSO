@@ -16,6 +16,7 @@ class InventoryManager:
         """
         self.data_directory = data_directory
         self.inventory_df = None
+        self.stock_threshold = 10
         self.setup_logging()
 
     def setup_logging(self) -> None:
@@ -35,6 +36,52 @@ class InventoryManager:
             )
         else:
             raise ValueError("Échec de la consolidation des fichiers")
+
+    def set_stock_threshold(self, threshold: int) -> None:
+        """
+        Configure le seuil d'alerte pour le stock bas.
+
+        Args:
+            threshold (int): Nouveau seuil d'alerte
+        """
+        if not isinstance(threshold, int) or threshold < 0:
+            raise ValueError("Le seuil doit être un entier positif")
+        self.stock_threshold = threshold
+
+    def get_low_stock_products(self) -> pd.DataFrame:
+        """
+        Retourne les produits dont le stock est inférieur au seuil.
+
+        Returns:
+            pd.DataFrame: DataFrame contenant les produits en stock bas
+        """
+        if self.inventory_df is None:
+            raise ValueError("Base de données non initialisée")
+
+        return self.inventory_df[
+            self.inventory_df["quantity"] <= self.stock_threshold
+        ].copy()
+
+    def check_stock_alerts(self) -> list:
+        """
+        Vérifie et retourne les alertes de stock.
+
+        Returns:
+            list: Liste des alertes formatées
+        """
+        low_stock = self.get_low_stock_products()
+        alerts = []
+
+        for _, product in low_stock.iterrows():
+            alert = (
+                f"ALERTE: Stock bas pour {product['name']} "
+                f"({product['quantity']} unités restantes, "
+                f"seuil: {self.stock_threshold})"
+            )
+            alerts.append(alert)
+            logging.warning(alert)
+
+        return alerts
 
     def search_products(
         self,

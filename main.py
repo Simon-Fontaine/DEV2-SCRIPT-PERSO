@@ -50,6 +50,15 @@ def create_parser() -> argparse.ArgumentParser:
         "--desc", action="store_true", help="Trier par ordre décroissant"
     )
 
+    # Commande: alert
+    alert_parser = subparsers.add_parser("alerts", help="Gestion des alertes de stock")
+    alert_parser.add_argument(
+        "--threshold", type=int, help="Définir un nouveau seuil d'alerte"
+    )
+    alert_parser.add_argument(
+        "--check", action="store_true", help="Vérifier les alertes de stock"
+    )
+
     # Commande: search
     search_parser = subparsers.add_parser("search", help="Rechercher des produits")
     search_parser.add_argument(
@@ -113,6 +122,26 @@ def handle_list_command(manager: InventoryManager, args):
         display_results(df, "Liste des produits")
     except Exception as e:
         rprint(f"[red]Erreur lors de l'affichage : {str(e)}[/red]")
+
+
+def handle_alerts_command(manager: InventoryManager, args):
+    """Gère la commande 'alerts'."""
+    try:
+        if args.threshold is not None:
+            manager.set_stock_threshold(args.threshold)
+            rprint(f"[green]Seuil d'alerte mis à jour : {args.threshold}[/green]")
+
+        if args.check:
+            alerts = manager.check_stock_alerts()
+            if alerts:
+                rprint("\n[bold red]🚨 Alertes de stock bas[/bold red]")
+                for alert in alerts:
+                    rprint(f"[yellow]• {alert}[/yellow]")
+            else:
+                rprint("[green]Aucune alerte de stock bas[/green]")
+
+    except Exception as e:
+        rprint(f"[red]Erreur lors de la gestion des alertes : {str(e)}[/red]")
 
 
 def handle_search_command(manager: InventoryManager, args):

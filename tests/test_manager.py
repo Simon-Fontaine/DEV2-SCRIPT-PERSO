@@ -55,3 +55,23 @@ class TestInventoryManager(unittest.TestCase):
         report_file = Path(self.temp_dir) / "report.csv"
         self.manager.generate_report(str(report_file))
         self.assertTrue(report_file.exists())
+
+    def test_stock_alerts(self):
+        """Test du système d'alertes de stock."""
+        self.manager.consolidate_files()
+
+        # Test du seuil par défaut
+        alerts = self.manager.check_stock_alerts()
+        self.assertIsInstance(alerts, list)
+
+        # Test de modification du seuil
+        self.manager.set_stock_threshold(25)
+        self.assertEqual(self.manager.stock_threshold, 25)
+
+        # Test avec un nouveau seuil
+        low_stock = self.manager.get_low_stock_products()
+        self.assertGreater(len(low_stock), 0)
+
+        # Test avec un seuil invalide
+        with self.assertRaises(ValueError):
+            self.manager.set_stock_threshold(-5)
